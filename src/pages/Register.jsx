@@ -1,25 +1,35 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import React from "react";
+import React, { useState } from "react";
 import { auth } from "../Firebase/Firebase.init";
 
 const Register = () => {
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
+  const handleRegister = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    console.log(email, password);
+    const regex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
-        const handleRegister = (e) =>{
-            e.preventDefault()
-            const email = e.target.email.value ;
-            const password = e.target.password.value
-            console.log(email, password)
+    if (!regex.test(password)) {
+            console.log("pass no matched")
+            return
+    }
+        setError("");
+    setSuccess(false);
 
-            createUserWithEmailAndPassword(auth, email, password)
-            .then(result=>{
-                console.log("New user", result.user)
-            })
-            .catch((err)=>{
-                console.log(err)
-            })
-        }
-
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        console.log("New user", result.user);
+        setSuccess(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(err.message);
+      });
+  };
 
   return (
     <div className="hero bg-base-200 min-h-screen">
@@ -32,7 +42,12 @@ const Register = () => {
             <div className="card-body">
               <fieldset className="fieldset">
                 <label className="label">Email</label>
-                <input type="email" className="input" name="email" placeholder="Email" />
+                <input
+                  type="email"
+                  className="input"
+                  name="email"
+                  placeholder="Email"
+                />
                 <label className="label">Password</label>
                 <input
                   type="password"
@@ -41,9 +56,12 @@ const Register = () => {
                   placeholder="Password"
                 />
                 <div>
-                  <a className="link link-hover">Forgot password?</a>
+                  <p className="text-red-500">{error}</p>
+                  <p className="text-green-500">
+                    {success && "Successfully Created"}
+                  </p>
                 </div>
-                <button  className="btn btn-neutral mt-4">Register</button>
+                <button className="btn btn-neutral mt-4">Register</button>
               </fieldset>
             </div>
           </form>
