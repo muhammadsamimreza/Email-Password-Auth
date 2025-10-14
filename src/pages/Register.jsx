@@ -1,25 +1,32 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../Firebase/Firebase.init";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link } from "react-router";
 
 const Register = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPAssword] = useState(false);
 
   const handleRegister = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log(email, password);
+    const terms =e.target.terms.checked;
+    console.log(email, password, terms);
     const regex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
     if (!regex.test(password)) {
-            console.log("pass no matched")
-            return
+      console.log("pass no matched");
+      return;
     }
-        setError("");
+    setError("");
     setSuccess(false);
-
+    if(!terms){
+      setError("Please checked Our Terms And Conditons")
+      return
+    }
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log("New user", result.user);
@@ -29,6 +36,11 @@ const Register = () => {
         console.log(err);
         setError(err.message);
       });
+  };
+
+  const handleShowPassword = (event) => {
+    event.preventDefault();
+    setShowPAssword(!showPassword);
   };
 
   return (
@@ -49,19 +61,39 @@ const Register = () => {
                   placeholder="Email"
                 />
                 <label className="label">Password</label>
-                <input
-                  type="password"
-                  className="input"
-                  name="password"
-                  placeholder="Password"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="input "
+                    name="password"
+                    placeholder="Password"
+                  />
+                  <button
+                    className="absolute top-[15px] right-4"
+                    onClick={handleShowPassword}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
                 <div>
                   <p className="text-red-500">{error}</p>
                   <p className="text-green-500">
                     {success && "Successfully Created"}
                   </p>
                 </div>
+                <div>
+                  <label className="label">
+                    <input
+                    name="terms"
+                      type="checkbox"
+                      defaultChecked
+                      className="checkbox text-black"
+                    />
+                    Accept Our Term And Condition
+                  </label>
+                </div>
                 <button className="btn btn-neutral mt-4">Register</button>
+          <p>Already  Have An Account ? <Link to='/login' className="text-blue-500 underline">Lon in</Link></p>
               </fieldset>
             </div>
           </form>
